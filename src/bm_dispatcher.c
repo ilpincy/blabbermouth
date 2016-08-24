@@ -17,6 +17,11 @@
  */
 static int done = 0;
 
+/*
+ * Active threads
+ */
+static int active_threads = 0;
+
 /****************************************/
 /****************************************/
 
@@ -55,6 +60,7 @@ void* bm_dispatcher_thread(void* arg) {
    bm_dispatcher_thread_data_t data = (bm_dispatcher_thread_data_t)arg;
    /* Wait for start signal */
    pthread_mutex_lock(&data->dispatcher->startmutex);
+   ++active_threads;
    while(data->dispatcher->start == 0)
       pthread_cond_wait(&data->dispatcher->startcond,
                         &data->dispatcher->startmutex);
@@ -67,6 +73,10 @@ void* bm_dispatcher_thread(void* arg) {
                             buf,
                             data->dispatcher->msg_len) <= 0) {
          /* Error receiving data, exit */
+         fprintf(stderr, "%s: exiting\n", data->stream->descriptor);
+         pthread_mutex_lock(&data->dispatcher->startmutex);
+         --active_threads;
+         pthread_mutex_unlock(&data->dispatcher->startmutex);
          return NULL;
       }
       /* Broadcast data */
@@ -75,6 +85,9 @@ void* bm_dispatcher_thread(void* arg) {
                               buf);
    }
    /* All done */
+   pthread_mutex_lock(&data->dispatcher->startmutex);
+   --active_threads;
+   pthread_mutex_unlock(&data->dispatcher->startmutex);
    return NULL;
 }
 
@@ -232,7 +245,12 @@ void bm_dispatcher_execute(bm_dispatcher_t d) {
    pthread_mutex_unlock(&d->startmutex);
    pthread_cond_broadcast(&d->startcond);
    /* Wait for done signal */
-   while(!done) sleep(1);
+   while(!done) {
+      sleep(1);
+      pthread_mutex_lock(&d->startmutex);
+      if(active_threads == 0) done = 1;
+      pthread_mutex_unlock(&d->startmutex);
+   }
    /* Cancel all threads */
    for(bm_datastream_t s = d->streams;
        s != NULL;
