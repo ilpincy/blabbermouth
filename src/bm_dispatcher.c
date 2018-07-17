@@ -178,18 +178,20 @@ int bm_dispatcher_stream_add(bm_dispatcher_t d,
       /* Create new TCP stream */
       stream = (bm_datastream_t)bm_tcp_datastream_new(s);
    }
+#ifdef BLABBERMOUTH_WITH_BT
    else if(strcmp(tok, "bt") == 0) {
       /* Create new Bluetooth stream */
       fprintf(stderr, "'%s': Bluetooth streams not supported yet\n", s);
       free(ws);
       return 0;
    }
-   else if(strcmp(tok, "xbee") == 0) {
-      /* Create new XBee stream */
-      fprintf(stderr, "'%s': XBee streams not supported yet\n", s);
-      free(ws);
-      return 0;
-   }
+#endif
+   /* else if(strcmp(tok, "xbee") == 0) { */
+   /*    /\* Create new XBee stream *\/ */
+   /*    fprintf(stderr, "'%s': XBee streams not supported yet\n", s); */
+   /*    free(ws); */
+   /*    return 0; */
+   /* } */
    else {
       fprintf(stderr, "'%s': Unknown stream type '%s'\n", s, tok);
       free(ws);

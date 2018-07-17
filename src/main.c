@@ -2,6 +2,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <config.h>
 #include "bm_dispatcher.h"
 #include "bm_bt_datastream.h"
 
@@ -21,19 +22,23 @@ void usage(FILE* stream, const char* prg) {
    fprintf(stream, "Each message managed by BlabberMouth must be exactly SIZE bytes long, so the\n");
    fprintf(stream, "-s option is required.\n\n");
    fprintf(stream, "The syntax for stream descriptors is: ID:TYPE:DATA, where ID is a unique\n");
-   fprintf(stream, "identifier for the stream; TYPE is a case-sensitive string such as 'tcp', 'bt',\n");
-   fprintf(stream, "or 'xbee'; and DATA is a colon-separated string of fields that specify how to\n");
-   fprintf(stream, "connect to the stream.\n\n");
+   fprintf(stream, "identifier for the stream; TYPE is a case-sensitive string such as 'tcp', 'udp',\n");
+   fprintf(stream, "'bt', or 'xbee'; and DATA is a colon-separated string of fields that specify\n");
+   fprintf(stream, "how to connect to the stream.\n\n");
    fprintf(stream, "Supported stream descriptors:\n\n");
    fprintf(stream, "  ID:tcp:SERVER:PORT      A TCP connection to SERVER on PORT\n");
+   fprintf(stream, "  ID:udp:SERVER:PORT      A UDP connection to SERVER on PORT\n");
+#ifdef BLABBERMOUTH_WITH_BT
    fprintf(stream, "  ID:bt:rfcomm:CHANNEL    An RFComm Bluetooth connection on CHANNEL\n");
-   fprintf(stream, "  ID:xbee:ADDRESS:PORT    An XBee connection to ADDRESS on PORT\n");
+#endif
+   /* fprintf(stream, "  ID:xbee:ADDRESS:PORT    An XBee connection to ADDRESS on PORT\n"); */
    fprintf(stream, "\nOptions:\n\n");
    fprintf(stream, "  -s SIZE | --size SIZE   The size (in bytes) of a message\n");
    fprintf(stream, "  -f FILE | --file FILE   A file containing one stream descriptor per line\n");
    fprintf(stream, "\n== SCANNING ==\n\n");
    fprintf(stream, "In scanning mode, Blabbermouth looks for Bluetooth devices to connect to and\n");
-   fprintf(stream, "prints a list of available devices.\n");
+   fprintf(stream, "prints a list of available devices. BlueZ must be installed for Bluetooth to be\n");
+   fprintf(stream, "supported.\n");
    fprintf(stream, "\n");
 }
 
@@ -95,9 +100,11 @@ int main(int argc, char* argv[]) {
          fprintf(stderr, "%s: mode 'scan' accepts no options\n", argv[0]);
          return EXIT_FAILURE;
       }
+#ifdef BLABBERMOUTH_WITH_BT
       /* Execute bluetooth scan */
       if(!bm_bt_scan())
          return EXIT_FAILURE;
+#endif
    }
    else {
       /* Streaming mode */
