@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 #include <errno.h>
 #include <netdb.h>
 #include <sys/types.h>
@@ -128,24 +127,26 @@ int bm_udp_datastream_connect(void* ds) {
    for(iface = ifaceinfo;
        (iface != NULL) && (this->stream == -1);
        iface = iface->ai_next) {
+      /* Let's try this interface... */
       this->stream = socket(iface->ai_family,
                             iface->ai_socktype,
                             iface->ai_protocol);
       if(this->stream > 0) {
-         if(connect(this->stream,
-                    iface->ai_addr,
-                    iface->ai_addrlen) == -1) {
-            this->stream = -1;
-            bm_datastream_set_status(this,
-                                     BM_DATASTREAM_ERROR,
-                                     strerror(errno));
-            return 0;
-         }
+         /* We have a socket, let's save it */
+         memcpy(&this->sock, iface->ai_addr, sizeof(this->sock));
+         freeaddrinfo(ifaceinfo);
+         bm_datastream_set_status(ds, BM_DATASTREAM_READY, "ready");
+         /* Send a HELLO message to start up the connection */
+         uint8_t hello = 0;
+         bm_udp_datastream_send(this, &hello, 1);
+         return 1;
       }
    }
-   freeaddrinfo(ifaceinfo);
-   bm_datastream_set_status(ds, BM_DATASTREAM_READY, "ready");
-   return 1;
+   /* None of the interfaces worked, error */
+   bm_datastream_set_status(this,
+                            BM_DATASTREAM_ERROR,
+                            strerror(errno));
+   return 0;
 }
 
 /****************************************/
@@ -158,8 +159,8 @@ void bm_udp_datastream_disconnect(void* ds) {
       /* Close stream */
       close(this->stream);
       this->stream = -1;
-      bm_datastream_set_status(ds, BM_DATASTREAM_UNKNOWN, "unknown");
    }
+   bm_datastream_set_status(ds, BM_DATASTREAM_UNKNOWN, "unknown");
 }
 
 /****************************************/
@@ -176,7 +177,7 @@ ssize_t bm_udp_datastream_send(void* ds,
    ssize_t tot = sz, sent;
    /* Keep sending until done or error */
    while(tot > 0) {
-      sent = send(this->stream, data, tot, 0);
+      sent = sendto(this->stream, data, tot, 0, (struct sockaddr*)(&this->sock), sizeof(this->sock));
       if(sent < 0) {
          bm_udp_datastream_disconnect(this);
          bm_datastream_set_status(this,
@@ -203,8 +204,9 @@ ssize_t bm_udp_datastream_recv(void* ds,
    if(this->parent.status != BM_DATASTREAM_READY) return -1;
    /* To keep track of how many bytes have been received */
    ssize_t tot = sz, received;
+   socklen_t addrlen;
    while(tot > 0) {
-      received = recv(this->stream, data, tot, 0);
+      received = recvfrom(this->stream, data, tot, 0, (struct sockaddr*)(&this->sock), &addrlen);
       if(received < 0){
          bm_udp_datastream_disconnect(this);
          bm_datastream_set_status(this,
@@ -244,6 +246,7 @@ bm_udp_datastream_t bm_udp_datastream_new(const char* desc) {
       bm_udp_datastream_destroy(this);
       return NULL;
    }
+   memset(&this->sock, 0, sizeof(this->sock));
    /* All done */
    return this;
 }

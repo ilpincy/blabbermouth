@@ -2,6 +2,7 @@
 #define BM_UDP_DATASTREAM_H
 
 #include "bm_datastream.h"
+#include <arpa/inet.h>
 
 /*
  * The string for udp connect is:
@@ -17,6 +18,8 @@ struct bm_udp_datastream_s {
    char* server;
    /* Port */
    char* port;
+   /* Socket */
+   struct sockaddr_in sock;
 };
 typedef struct bm_udp_datastream_s* bm_udp_datastream_t;
 

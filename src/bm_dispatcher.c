@@ -1,5 +1,6 @@
 #include "bm_dispatcher.h"
 #include "bm_tcp_datastream.h"
+#include "bm_udp_datastream.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -177,6 +178,10 @@ int bm_dispatcher_stream_add(bm_dispatcher_t d,
    if(strcmp(tok, "tcp") == 0) {
       /* Create new TCP stream */
       stream = (bm_datastream_t)bm_tcp_datastream_new(s);
+   }
+   else if(strcmp(tok, "udp") == 0) {
+      /* Create new UDP stream */
+      stream = (bm_datastream_t)bm_udp_datastream_new(s);
    }
 #ifdef BLABBERMOUTH_WITH_BT
    else if(strcmp(tok, "bt") == 0) {

@@ -35,6 +35,7 @@ void bm_datastream_init(bm_datastream_t ds,
    strncpy(ds->id, desc, delim - desc);
    ds->id[delim - desc + 1] = '\0';
    /* Set status */
+   ds->status_desc = NULL;
    bm_datastream_set_status(ds, BM_DATASTREAM_UNKNOWN, "unknown");
    /* Set next */
    ds->next = NULL;

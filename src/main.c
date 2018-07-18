@@ -26,10 +26,10 @@ void usage(FILE* stream, const char* prg) {
    fprintf(stream, "'bt', or 'xbee'; and DATA is a colon-separated string of fields that specify\n");
    fprintf(stream, "how to connect to the stream.\n\n");
    fprintf(stream, "Supported stream descriptors:\n\n");
-   fprintf(stream, "  ID:tcp:SERVER:PORT      A TCP connection to SERVER on PORT\n");
-   fprintf(stream, "  ID:udp:SERVER:PORT      A UDP connection to SERVER on PORT\n");
+   fprintf(stream, "  ID:tcp:SERVER:PORT   A TCP connection to SERVER on PORT\n");
+   fprintf(stream, "  ID:udp:SERVER:PORT   A UDP connection to SERVER on PORT\n");
 #ifdef BLABBERMOUTH_WITH_BT
-   fprintf(stream, "  ID:bt:rfcomm:CHANNEL    An RFComm Bluetooth connection on CHANNEL\n");
+   fprintf(stream, "  ID:bt:rfcomm:CHANNEL An RFComm Bluetooth connection on CHANNEL\n");
 #endif
    /* fprintf(stream, "  ID:xbee:ADDRESS:PORT    An XBee connection to ADDRESS on PORT\n"); */
    fprintf(stream, "\nOptions:\n\n");
