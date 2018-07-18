@@ -25,16 +25,19 @@ sends it over the other streams.
 Each message managed by BlabberMouth must be exactly `SIZE` bytes
 long, so the `-s` option is required.
 
-The syntax for stream descriptors is: `ID:TYPE:DATA`, where `ID` is a
-unique identifier for the stream; `TYPE` is a case-sensitive string
-such as `tcp`, `udp`, `bt`, or `xbee`; and `DATA` is a colon-separated
-string of fields that specify how to connect to the stream.
+The syntax for stream descriptors is: `ID:TYPE:VERBOSE:DATA`, where
+`ID` is a unique identifier for the stream; `TYPE` is a case-sensitive
+string such as `tcp`, `udp`, `bt`, or `xbee`; `VERBOSE` is a flag
+(`0`/`1`) to establish whether BlabberMouth should log when
+sending/receiving messages on the console; and `DATA` is a
+colon-separated string of fields that specify how to connect to the
+stream.
 
 Supported stream descriptors:
 
-    ID:tcp:SERVER:PORT   A TCP connection to SERVER on PORT
-    ID:udp:SERVER:PORT   A UDP connection to SERVER on PORT
-    ID:bt:rfcomm:CHANNEL An RFComm Bluetooth connection on CHANNEL
+    ID:tcp:VERBOSE:SERVER:PORT   A TCP connection to SERVER on PORT
+    ID:udp:VERBOSE:SERVER:PORT   A UDP connection to SERVER on PORT
+    ID:bt:VERBOSE:rfcomm:CHANNEL An RFComm Bluetooth connection on CHANNEL
 
 Options:
 
@@ -63,7 +66,7 @@ In the second write:
     
 In the third write:
 
-    ./blabbermouth -s 5 1:tcp:localhost:12345 2:tcp:localhost:12346
+    ./blabbermouth -s 5 1:tcp:1:localhost:12345 2:tcp:1:localhost:12346
 
 Now type a five-character string in either of the first two terminals,
 and press enter. The other terminal where `nc` is running should show
@@ -81,7 +84,7 @@ In the second write:
     
 In the third write:
 
-    ./blabbermouth -s 5 1:udp:localhost:12345 2:udp:localhost:12346
+    ./blabbermouth -s 5 1:udp:1:localhost:12345 2:udp:1:localhost:12346
 
 Now type a five-character string in either of the first two terminals,
 and press enter. The other terminal where `nc` is running should show
@@ -99,7 +102,7 @@ In the second write:
     
 In the third write:
 
-    ./blabbermouth -s 5 1:tcp:localhost:12345 2:udp:localhost:12346
+    ./blabbermouth -s 5 1:tcp:1:localhost:12345 2:udp:1:localhost:12346
 
 Now type a five-character string in either of the first two terminals,
 and press enter. The other terminal where `nc` is running should show

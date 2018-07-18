@@ -22,6 +22,7 @@ set(SOURCES
   bm_tcp_datastream.h bm_tcp_datastream.c
   bm_udp_datastream.h bm_udp_datastream.c
   bm_dispatcher.h bm_dispatcher.c
+  bm_debug.h bm_debug.c
   main.c)
 if(BLUEZ_FOUND)
   set(SOURCES ${SOURCES}

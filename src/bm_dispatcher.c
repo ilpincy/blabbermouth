@@ -191,14 +191,22 @@ int bm_dispatcher_stream_add(bm_dispatcher_t d,
       return 0;
    }
 #endif
-   /* else if(strcmp(tok, "xbee") == 0) { */
-   /*    /\* Create new XBee stream *\/ */
-   /*    fprintf(stderr, "'%s': XBee streams not supported yet\n", s); */
-   /*    free(ws); */
-   /*    return 0; */
-   /* } */
    else {
       fprintf(stderr, "'%s': Unknown stream type '%s'\n", s, tok);
+      free(ws);
+      return 0;
+   }
+   /* Set verbosity */
+   tok = strtok_r(NULL, ":", &saveptr);
+   if(!tok) {
+      fprintf(stderr, "Can't parse '%s'\n", s);
+      free(ws);
+      return 0;
+   }
+   char* endptr;
+   stream->verbose = strtol(tok, &endptr, 10);
+   if(*endptr != 0) {
+      fprintf(stderr, "Can't parse '%s'\n", s);
       free(ws);
       return 0;
    }

@@ -1,1 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #cmakedefine BLABBERMOUTH_WITH_BT
+
+#endif

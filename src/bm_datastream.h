@@ -34,6 +34,8 @@ struct bm_datastream_s {
    char* id;
    /* The thread handle associated to this stream */
    pthread_t thread;
+   /* Verbose flag */
+   int verbose;
    /* Used to have manage the linked list of streams */
    struct bm_datastream_s* next;
 };

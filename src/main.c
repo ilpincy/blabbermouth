@@ -21,15 +21,16 @@ void usage(FILE* stream, const char* prg) {
    fprintf(stream, "a stream, BlabberMouth collects the data and sends it over the other streams.\n\n");
    fprintf(stream, "Each message managed by BlabberMouth must be exactly SIZE bytes long, so the\n");
    fprintf(stream, "-s option is required.\n\n");
-   fprintf(stream, "The syntax for stream descriptors is: ID:TYPE:DATA, where ID is a unique\n");
+   fprintf(stream, "The syntax for stream descriptors is: ID:TYPE:VERBOSE:DATA, where ID is a unique\n");
    fprintf(stream, "identifier for the stream; TYPE is a case-sensitive string such as 'tcp', 'udp',\n");
-   fprintf(stream, "'bt', or 'xbee'; and DATA is a colon-separated string of fields that specify\n");
-   fprintf(stream, "how to connect to the stream.\n\n");
+   fprintf(stream, "'bt', or 'xbee'; VERBOSE is a flag (0/1) to establish whether BlabberMouth should\n");
+   fprintf(stream, "log when sending/receiving messages on the console; and DATA is a colon-separated\n");
+   fprintf(stream, "string of fields that specify how to connect to the stream.\n\n");
    fprintf(stream, "Supported stream descriptors:\n\n");
-   fprintf(stream, "  ID:tcp:SERVER:PORT   A TCP connection to SERVER on PORT\n");
-   fprintf(stream, "  ID:udp:SERVER:PORT   A UDP connection to SERVER on PORT\n");
+   fprintf(stream, "  ID:tcp:VERBOSE:SERVER:PORT   A TCP connection to SERVER on PORT\n");
+   fprintf(stream, "  ID:udp:VERBOSE:SERVER:PORT   A UDP connection to SERVER on PORT\n");
 #ifdef BLABBERMOUTH_WITH_BT
-   fprintf(stream, "  ID:bt:rfcomm:CHANNEL An RFComm Bluetooth connection on CHANNEL\n");
+   fprintf(stream, "  ID:bt:VERBOSE:rfcomm:CHANNEL An RFComm Bluetooth connection on CHANNEL\n");
 #endif
    /* fprintf(stream, "  ID:xbee:ADDRESS:PORT    An XBee connection to ADDRESS on PORT\n"); */
    fprintf(stream, "\nOptions:\n\n");

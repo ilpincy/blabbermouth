@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 
 #include "bm_tcp_datastream.h"
+#include "bm_debug.h"
 
 /****************************************/
 /****************************************/
@@ -31,32 +32,10 @@ int bm_tcp_datastream_parse(bm_tcp_datastream_t ds,
    char* saveptr = NULL;
    /* Get id (and discard it) */
    char* tok = strtok_r(wdesc, ":", &saveptr);
-   if(!tok) {
-      bm_datastream_set_status(ds,
-                               BM_DATASTREAM_ERROR,
-                               "Can't parse '%s'",
-                               desc);
-      free(wdesc);
-      return 0;
-   }
-   /* Get protocol */
+   /* Get protocol (and discard it) */
    tok = strtok_r(NULL, ":", &saveptr);
-   if(!tok) {
-      bm_datastream_set_status(ds,
-                               BM_DATASTREAM_ERROR,
-                               "Can't parse '%s'",
-                               desc);
-      free(wdesc);
-      return 0;
-   }
-   if(strcmp(tok, "tcp") != 0) {
-      bm_datastream_set_status(ds,
-                               BM_DATASTREAM_ERROR,
-                               "Stream descriptor '%s' is not a tcp stream",
-                               desc);
-      free(wdesc);
-      return 0;
-   }
+   /* Get verbosity (and discard it) */
+   tok = strtok_r(NULL, ":", &saveptr);
    /* Get server */
    tok = strtok_r(NULL, ":", &saveptr);
    if(!tok) {
@@ -176,7 +155,9 @@ ssize_t bm_tcp_datastream_send(void* ds,
    ssize_t tot = sz, sent;
    /* Keep sending until done or error */
    while(tot > 0) {
+      bm_debug(ds, "send: sending %zd bytes", tot);
       sent = send(this->stream, data, tot, 0);
+      bm_debug(ds, "send: sent %zd bytes", sent);
       if(sent < 0) {
          bm_tcp_datastream_disconnect(this);
          bm_datastream_set_status(this,
@@ -204,7 +185,9 @@ ssize_t bm_tcp_datastream_recv(void* ds,
    /* To keep track of how many bytes have been received */
    ssize_t tot = sz, received;
    while(tot > 0) {
+      bm_debug(ds, "recv: waiting for %zd bytes", tot);
       received = recv(this->stream, data, tot, 0);
+      bm_debug(ds, "recv: received %zd bytes", received);
       if(received < 0){
          bm_tcp_datastream_disconnect(this);
          bm_datastream_set_status(this,
